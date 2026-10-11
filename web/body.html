@@ -1,0 +1,43 @@
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 26 18" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M1.5 2l11.5 8.5L24.5 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+      <b>Конверт</b>
+      <span>антифрод по метаданным вызова</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Разделы">
+      <button class="tab" role="tab" data-tab="overview">Обзор</button>
+      <button class="tab" role="tab" data-tab="numbers">Номера</button>
+      <button class="tab" role="tab" data-tab="legit">Не фрод</button>
+      <button class="tab" role="tab" data-tab="check">Проверка вызова</button>
+      <button class="tab" role="tab" data-tab="method">Как это работает</button>
+    </nav>
+    <div class="tools">
+      <button class="tool" id="mask-toggle" type="button" aria-pressed="true" title="Маскировать номера">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/></svg>
+        <span id="mask-label">Номера скрыты</span>
+      </button>
+      <button class="tool" id="theme-toggle" type="button" title="Сменить тему">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11a5.5 5.5 0 000-11z" fill="currentColor"/></svg>
+        <span class="sr">Тема</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="tab-overview" role="tabpanel"></section>
+  <section id="tab-numbers" role="tabpanel" hidden></section>
+  <section id="tab-legit" role="tabpanel" hidden></section>
+  <section id="tab-check" role="tabpanel" hidden></section>
+  <section id="tab-method" role="tabpanel" hidden></section>
+</main>
+
+<footer>
+  Хакатон «Телеком будущего 2026», кейс Nexign «Антифрод без прослушки». Данные синтетические: CDR за 1–5 октября 2026.
+</footer>
+
+<div id="drawer-root"></div>
