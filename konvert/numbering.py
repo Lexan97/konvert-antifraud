@@ -36,6 +36,20 @@ def is_emergency(number: str | None) -> bool:
     return bool(number) and number.lstrip("+") in EMERGENCY
 
 
+def load_whitelist(path: str | None) -> frozenset:
+    """Белый список оператора: один номер на строку, # — комментарий.
+
+    Файла может не быть — тогда список пуст, и это нормальное состояние.
+    """
+    import os
+
+    if not path or not os.path.exists(path):
+        return frozenset()
+    with open(path, encoding="utf-8") as fh:
+        nums = [line.strip().lstrip("+") for line in fh]
+    return frozenset(n for n in nums if n and not n.startswith("#"))
+
+
 def mask(number: str | None) -> str:
     """+7 499 ***-**-12 — маскирование для интерфейса и отчётов."""
     if not number or len(number) != 10:

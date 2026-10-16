@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Тесты (расчёт и модель не нужны — тесты работают на искусственной сети)
+        run: python -m pytest tests -q
+      - name: Ответ на месте и формат совпадает с TASK.md
+        run: |
+          python - <<'PY'
+          import re, sys
+          rows = [l.strip() for l in open("outputs/answer.txt", encoding="utf-8")
+                  if l.strip() and not l.startswith("#")]
+          bad = [r for r in rows if not re.fullmatch(r"\d{10}(;S[1-7])?", r)]
+          print(f"номеров в ответе: {len(rows)}, кривых строк: {len(bad)}")
+          sys.exit(1 if bad or len(rows) < 100 else 0)
+          PY

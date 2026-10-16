@@ -17,7 +17,7 @@ import pandas as pd
 from . import __version__, config as C, early
 from .detectors import FRAUD_DETECTORS, Finding, recognize_legit
 from .io import load_cached
-from .numbering import mask, operator, pretty
+from .numbering import load_whitelist, mask, operator, pretty
 from .policy import decide
 from .profile import activity_by_hour, build_profiles
 from .schemes import FRAUD, LEGIT, ROLES
@@ -52,13 +52,18 @@ def run(cdr_dir: str, out_dir: str, log=print, with_ml: bool = True) -> dict:
         legit_by_num.setdefault(f.number, f)
 
     numbers, conflicts = [], []
+    whitelist = load_whitelist(C.WHITELIST_FILE)
+    if whitelist:
+        log(f"Белый список оператора: {len(whitelist)} номеров из {C.WHITELIST_FILE}")
     for num, f in best.items():
         lm = legit_by_num.get(num)
         if lm:
             conflicts.append(num)
         numbers.append(_card(f, decide(f.scheme, f.role, f.score, len(f.factors), num,
-                                       legit_match=lm.scheme if lm else None), extra.get(num, [])))
-    legit_cards = [_card(f, decide(f.scheme, f.role, f.score, len(f.factors), f.number))
+                                       legit_match=lm.scheme if lm else None, whitelist=whitelist),
+                             extra.get(num, [])))
+    legit_cards = [_card(f, decide(f.scheme, f.role, f.score, len(f.factors), f.number,
+                                   whitelist=whitelist))
                    for n, f in legit_by_num.items() if n not in best]
 
     answer = sorted((c for c in numbers if c["score"] >= C.ANSWER_MIN_SCORE), key=lambda c: (c["scheme"], c["group"] or "", c["number"]))

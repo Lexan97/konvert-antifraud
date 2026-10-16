@@ -1,6 +1,7 @@
 """Скоринг вызова и политика: экстренные номера не блокируются ни при каких условиях."""
 import pytest
 
+from konvert.numbering import load_whitelist
 from konvert.policy import decide
 from konvert.scoring import NumberIndex, normalize, score_call
 
@@ -39,6 +40,26 @@ def test_emergency_and_whitelist_numbers_are_never_autoblocked_by_policy():
     assert decide("S3", "sim", 100, 5, "103")["action"] == "never_block"
     wl = decide("S3", "sim", 100, 5, "4950000000", whitelist=frozenset({"4950000000"}))
     assert wl["action"] == "never_block" and wl["autoblock"] is False
+
+
+def test_whitelist_file_is_read_and_tolerates_comments_and_spaces(tmp_path):
+    path = tmp_path / "whitelist.txt"
+    path.write_text("# банк\n\n4950000000\n +74991234567 \n", encoding="utf-8")
+    assert load_whitelist(str(path)) == frozenset({"4950000000", "74991234567"})
+    # файла нет — это нормальное состояние, а не ошибка
+    assert load_whitelist(str(tmp_path / "net-fayla.txt")) == frozenset()
+    assert load_whitelist(None) == frozenset()
+
+
+def test_whitelist_from_file_flips_autoblock_decision(tmp_path, monkeypatch):
+    """Номер из файла белого списка не блокируется, хотя схема и балл позволяют."""
+    from konvert import config, numbering, policy
+
+    monkeypatch.setattr(config, "WHITELIST_FILE", str(tmp_path / "wl.txt"))
+    (tmp_path / "wl.txt").write_text("8990000001\n", encoding="utf-8")
+    wl = numbering.load_whitelist(config.WHITELIST_FILE)
+    assert policy.decide("S3", "sim", 100, 5, "8990000001", whitelist=wl)["autoblock"] is False
+    assert policy.decide("S3", "sim", 100, 5, "8990000001", whitelist=frozenset())["autoblock"] is True
 
 
 def test_fraud_caller_keeps_its_own_decision(index):

@@ -205,7 +205,7 @@
       '<div class="tiles">' +
       tile("Записей обработано", nf(D.meta.records), nf(q.rows_fixed) + " " + plural(q.rows_fixed, ["строка", "строки", "строк"]) + " с ошибками формата исправлено") +
       tile("Номеров в ответе", nf(s.fraud_numbers), "7 схем, детекторы отработали за " + Math.round(D.meta.detect_s || D.meta.runtime_s) + " с") +
-      tile("Вызовов с участием схем", nf(s.fraud_calls), pc(share, 1) + " всего трафика") +
+      tile("Вызовов с участием схем", nf(s.fraud_calls), pc(share, 1) + " всех записей CDR") +
       tile("Легальных источников", nf(s.legit_numbers), '<span class="ok">из них в ответе: ' + s.legit_conflicts + "</span>") +
       tile("Автоблокировка допустима", nf(s.autoblock), "для остальных " + nf(s.fraud_numbers - s.autoblock) + " решение за человеком") +
       "</div>" +
@@ -270,11 +270,16 @@
     return '<span class="sch"><span class="dot" style="--c:' + schemeColor(card.scheme) + '"></span>' + esc(schemeMeta(card.scheme).title) + "</span>";
   }
   function match(card, q) {
+    q = (q || "").trim();
     if (!q) return true;
+    // Код схемы ищется явно: «S3» и «s3» дают только S3.
+    if (/^s[1-7]$/i.test(q)) return card.scheme.toLowerCase() === q.toLowerCase();
     var digits = q.replace(/\D/g, "");
-    if (digits && card.number.indexOf(digits.replace(/^[78](?=\d{10}$)/, "")) >= 0) return true;
-    var text = (schemeMeta(card.scheme).title + " " + D.schemes.roles[card.role] + " " + card.operator).toLowerCase();
-    return !digits && text.indexOf(q.toLowerCase()) >= 0;
+    // Номером считаем запрос из 3+ цифр: одна-две цифры матчили бы половину таблицы.
+    if (digits.length >= 3 && card.number.indexOf(digits.replace(/^[78](?=\d{10}$)/, "")) >= 0) return true;
+    var text = (card.scheme + " " + schemeMeta(card.scheme).title + " " +
+                D.schemes.roles[card.role] + " " + card.operator).toLowerCase();
+    return text.indexOf(q.toLowerCase()) >= 0;
   }
 
   function renderNumbers() {
