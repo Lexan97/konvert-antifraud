@@ -706,7 +706,7 @@ footer { max-width: 1240px; margin-inline: auto; padding: 0 var(--gutter) 40px; 
       '<div class="sec-head"><h2 class="h-sec">Номера в ответе</h2><p>Каждый номер — с баллом и причинами. Нажмите на строку, чтобы открыть карточку.</p></div>' +
       '<div class="filters"><label class="search">' + ICON.search + '<span class="sr">Поиск</span><input id="q" type="search" placeholder="Номер, схема или оператор" value="' + esc(state.q) + '" autocomplete="off"></label>' +
       '<label><span class="sr">Решение</span><select class="sel" id="f-action">' +
-      [["all", "Любое решение"], ["auto", "Автоблокировка: да"], ["block", "Заблокировать"], ["flag", "Пометить абоненту"], ["review", "На проверку"]].map(function (o) {
+      [["all", "Любое решение"], ["auto", "Автоблокировка: да"], ["block", "Заблокировать"], ["flag", "Пометить абоненту"]].map(function (o) {
         return '<option value="' + o[0] + '"' + (state.action === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
       }).join("") + "</select></label>" +
       '<label><span class="sr">Сортировка</span><select class="sel" id="f-sort"><option value="score"' + (state.sort === "score" ? " selected" : "") + '>Сначала высокий балл</option><option value="volume"' + (state.sort === "volume" ? " selected" : "") + ">Сначала больше вызовов</option></select></label></div>" +
